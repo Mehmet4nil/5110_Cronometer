@@ -17,17 +17,19 @@ extern uint8_t SmallFont[];
 extern uint8_t BigNumbers[];
 const int buttonPin = 2;
 int buttonState = 0;
-static char buttonPress = 1;
+bool buttonPress = true;
 
+float starttime = 0, endtime = 0;
 signed short minutes, min, secondes, sec;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   myGLCD.InitLCD();
   myGLCD.setFont(SmallFont);
   randomSeed(analogRead(7));
   pinMode(buttonPin, INPUT);
+  starttime = millis();
 }
 
 void loop()
@@ -59,27 +61,35 @@ void loop()
   }
   //-------------------------------------------------
 
+  endtime = millis();
 
-
-  secondes ++;
+  if ((endtime - starttime) > 980.00) {
+    starttime = millis();
+    secondes ++;
+  }
 
   if (secondes == 60)
   {
     secondes = 0;
     minutes ++;
   }
-  myGLCD.setFont(SmallFont);
-  if (buttonState == HIGH) {
-    sec = secondes;
-    min = minutes;
 
+  myGLCD.setFont(SmallFont);
+  
+  if (buttonState == HIGH) {
+    if (buttonPress) {
+      sec = secondes;
+      min = minutes;
+      buttonPress = false;
+    }
     secondes = 0;
     minutes = 0;
     //buttonPress = 0;
+  } else {
+    buttonPress = true;
+    myGLCD.print(":", 37, 26);
+    myGLCD.print(String(min), 22, 26);
+    myGLCD.print(String(sec), 47, 26);
+    myGLCD.update();
   }
-  myGLCD.print(":", 37, 26);
-  myGLCD.print(String(min), 22, 26);
-  myGLCD.print(String(sec), 47, 26);
-  myGLCD.update();
-  delay(1000);
 }
