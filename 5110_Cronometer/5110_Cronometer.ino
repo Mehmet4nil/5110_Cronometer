@@ -17,6 +17,7 @@ LCD5110 myGLCD(8, 9, 10, 11, 12);
 
 RTC_DS3231 rtc;
 
+extern uint8_t TinyFont[];
 extern uint8_t SmallFont[];
 extern uint8_t BigNumbers[];
 const int buttonPin = 2;
@@ -53,25 +54,30 @@ void loop()
   myGLCD.clrScr();
 
   //-------------------------------------------------
+  myGLCD.setFont(TinyFont);
+  myGLCD.print(String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()), 0, 0);
+  myGLCD.print(" - " + String(now.day()) + "/" + String(now.month()) + "/" + String(now.year()), 32, 0);
+
+  //-------------------------------------------------
   myGLCD.setFont(SmallFont);
-  myGLCD.print(":", 37, 10);
+  myGLCD.print(":", 37, 18);
 
   myGLCD.setFont(BigNumbers);
   //-------------------------------------------------
   if (minutes < 10) {
-    myGLCD.print("0", 9, 0);
-    myGLCD.print(String(minutes), 22, 0);
+    myGLCD.print("0", 9, 8);
+    myGLCD.print(String(minutes), 22, 8);
   }
   else {
-    myGLCD.print(String(minutes), 8, 0);
+    myGLCD.print(String(minutes), 8, 8);
   }
   //-------------------------------------------------
   if (secondes < 10) {
-    myGLCD.print("0", 47, 0);
-    myGLCD.print(String(secondes), 60, 0);
+    myGLCD.print("0", 47, 8);
+    myGLCD.print(String(secondes), 60, 8);
   }
   else {
-    myGLCD.print(String(secondes), 46, 0);
+    myGLCD.print(String(secondes), 46, 8);
   }
   //-------------------------------------------------
 
@@ -99,22 +105,22 @@ void loop()
     //buttonPress = 0;
   } else {
     buttonPress = true;
-    myGLCD.print(":", 37, 26);
+    myGLCD.print(":", 37, 34);
     //-------------------------------------------------
     if (min < 10) {
-      myGLCD.print("0", 22, 26);
-      myGLCD.print(String(min), 28, 26);
+      myGLCD.print("0", 22, 34);
+      myGLCD.print(String(min), 28, 34);
     }
     else {
-      myGLCD.print(String(min), 22, 26);
+      myGLCD.print(String(min), 22, 34);
     }
     //-------------------------------------------------
     if (sec < 10) {
-      myGLCD.print("0", 47, 26);
-      myGLCD.print(String(sec), 53, 26);
+      myGLCD.print("0", 47, 34);
+      myGLCD.print(String(sec), 53, 34);
     }
     else {
-      myGLCD.print(String(sec), 47, 26);
+      myGLCD.print(String(sec), 47, 34);
     }
     //-------------------------------------------------
     myGLCD.update();
