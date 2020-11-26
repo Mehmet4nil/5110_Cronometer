@@ -56,7 +56,7 @@ void loop()
   //-------------------------------------------------
   myGLCD.setFont(TinyFont);
   myGLCD.print(String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()), 0, 0);
-  myGLCD.print(" - " + String(now.day()) + "/" + String(now.month()) + "/" + String(now.year()), 32, 0);
+  myGLCD.print("- " + String(now.day()) + "/" + String(now.month()) + "- " + String(rtc.getTemperature()).substring(0, 2) + "'C", 32, 0);
 
   //-------------------------------------------------
   myGLCD.setFont(SmallFont);
