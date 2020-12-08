@@ -20,11 +20,13 @@ RTC_DS3231 rtc;
 extern uint8_t TinyFont[];
 extern uint8_t SmallFont[];
 extern uint8_t BigNumbers[];
-const int buttonPin = 2;
-int buttonState = 0;
-bool buttonPress = true;
+const int buttonPin = 2, buttonPinP = 3;
+int buttonState = 0, buttonStateP = 0;
+bool buttonPress = true, buttonPressP = true, pause = true;
 
-int realSec, secondes = -1, minutes, min, sec;
+int realSec, secondes = 0, minutes, min, sec = 0;
+
+volatile unsigned long start_sec, mili_sec;
 
 void setup()
 {
@@ -33,6 +35,7 @@ void setup()
   myGLCD.setFont(SmallFont);
   randomSeed(analogRead(7));
   pinMode(buttonPin, INPUT);
+  pinMode(buttonPinP, INPUT);
 
   if (! rtc.begin()) {
     Serial.println("Couldn't find RTC");
@@ -50,6 +53,7 @@ void loop()
 {
   DateTime now = rtc.now();
   buttonState = digitalRead(buttonPin);
+  buttonStateP = digitalRead(buttonPinP);
 
   myGLCD.clrScr();
 
@@ -81,20 +85,25 @@ void loop()
   }
   //-------------------------------------------------
 
-  if (realSec == (now.second() - 1) || realSec - 60 == (now.second() - 1)) {
-    secondes ++;
-  }
-  realSec = now.second();
 
-  if (secondes == 60)
-  {
-    secondes = 0;
-    minutes ++;
+  if (pause == false) { //_Crono second play, pause
+    mili_sec = millis();
+    if (realSec == (now.second() - 1) || realSec - 60 == (now.second() - 1)) {
+      secondes ++;
+      start_sec = millis();
+    }
+    realSec = now.second();
+
+    if (secondes == 60)
+    {
+      secondes = 0;
+      minutes ++;
+    }
   }
 
   myGLCD.setFont(SmallFont);
 
-  if (buttonState == HIGH) {
+  if (buttonState == HIGH) { //_Crono reset button
     if (buttonPress) {
       sec = secondes;
       min = minutes;
@@ -103,7 +112,7 @@ void loop()
     secondes = 0;
     minutes = 0;
     //buttonPress = 0;
-  } else {
+  } else { //_Crono write the last counted time on the screen
     buttonPress = true;
     myGLCD.print(":", 37, 34);
     //-------------------------------------------------
@@ -123,6 +132,20 @@ void loop()
       myGLCD.print(String(sec), 47, 34);
     }
     //-------------------------------------------------
+    myGLCD.print(String(mili_sec - start_sec), 47, 41);
     myGLCD.update();
+  }
+
+  if (buttonStateP == HIGH) { //_Crono second play, pause button
+    if (buttonPressP) {
+      if (pause == true) {
+        pause = false;
+      } else {
+        pause = true;
+      }
+      buttonPressP = false;
+    }
+  } else {
+    buttonPressP = true;
   }
 }
